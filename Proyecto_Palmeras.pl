@@ -19,55 +19,53 @@ palm_needs(nina,2).
 palm_needs(elisa,4).
 
 % tamaño del balde
-:- dynamic(bucket/1).
 bucket(5).
-
-% tiempo acumulado
-:- dynamic(duration/1).
-duration(0).
 
 % tiempo minimo deseado por el jardinero
 desired_time(12).
 
+solve_dfs(Estado,[Movida|Movidas],Historia,Tiempo) :-
+      %move(Estado,Movida),              % generar una nueva Movida
+      update(Estado,Movida,Estado2,Tiempo2),    % calcula nuevo estado usando Movida
+      %legal(Estado2),                    % nuevo estado debe ser legal
+      solve_dfs(Estado2,Movidas,[Movida|Historia],Tiempo2).  % continuar a partir de nuevo estado
+
+test_dfs(Problema,Movidas,Tiempo) :-
+      initial_state(Problema,Estado),
+	  solve_dfs(Estado,[jasmine,sheherazade,nina,elisa],Movidas,Tiempo).
+
 %Estado inicial del problema
-initial_state(pwb,pwb(bucket(Y),duration(X),[jasmine,sheherazade,nina,elisa],[])) :-
-	bucket(B),
-	B == 5,
-	Y is B,
-	duration(D),
-	D == 0,
-	X is D.
+initial_state(pwb,pwd(well,Bucket,[jasmine,sheherazade,nina,elisa],[],0)) :-
+	bucket(Bucket).
 	
 %Estado final del problema
-final_state(pwb,pwb(bucket(Y),duration(X),[],[jasmine,sheherazade,nina,elisa])) :-
-	desired_time(Dt),
-	duration(D),
-	D >= Dt,
-	bucket(B),
-	B == 0,
-	Y is B,
-	X is D.
+final_state(pwb,Movidas,Bucket) :-
+	Bucket == 0,
+	Movidas == [].
 
 %Actualiza la duración, la lista de palmeras y el balde una vez regada la palmera.
-update(Palm, Water):- 
-	palm_needs(Palm,Z), 
-	Z\=0, 
-	Water-Z >=0, 
-	Y is -(Z-Water),
-	duration(T),
-	D is T+Z,
-	updatePalmsNeed(palm_needs(Palm,Z), palm_needs(Palm,0)),
-	updateDuration(duration(T),duration(D)),
-	updateBucket(bucket(Water),bucket(Y)).
+update(pwb(Posicion,Bucket,Palmeras,Historia,Tiempo),Movida, pwb(Posicion2,Bucket2,Palmeras2,Historia2,Tiempo2),Tiempo2):-
+	update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2),
+	update_tiempo(Movida,Tiempo,Tiempo2),
+	update_bucket(Bucket,Bucket2,Movida). 
+	
 
-updatePalmsNeed(PalmBefore, PalmAfter) :- 
-	retract(PalmBefore), 
-	assertz(PalmAfter).
+update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2):-
+	select(Movida,Palmeras,Palmeras2),
+	insert(Movida,Historia,Historia2).
 
-updateBucket(BucketBefore,BucketAfter) :- 
-	retract(BucketBefore), 
-	assertz(BucketAfter).
+update_tiempo(Movida,Tiempo,Tiempo2):-
+	palm_needs(Movida,Cantidad),
+	Tiempo2 is Tiempo+Cantidad.
 
-updateDuration(DurationBefore,DurationAfter):- 
-	retract(DurationBefore), 
-	assertz(DurationAfter).
+update_bucket(Bucket,Bucket2,Movida):-
+	palm_needs(Movida,Cantidad),
+	Bucket2 is Bucket-Cantidad.
+	
+select(X,[X|Xs],Xs).                          % Extrae primer elemento.
+select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).    % Extrae elemento de más adentro.
+
+insert(X,[Y|Ys],[Y|Zs]):-
+    insert(X,Ys,Zs).
+insert(X,[],[X]).
+	
