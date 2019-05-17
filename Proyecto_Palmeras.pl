@@ -18,9 +18,56 @@ palm_needs(sheherazade,1).
 palm_needs(nina,2).
 palm_needs(elisa,4).
 
-% tama�o del balde
+% tamaño del balde
+:- dynamic(bucket/1).
 bucket(5).
 
-update(Palm, Water):- palm_needs(Palm,X), X\=0, X-Water>=0, Y is X-Water, updateAux(palm_needs(Palm,X), palm_needs(Palm,Y)).
+% tiempo acumulado
+:- dynamic(duration/1).
+duration(0).
 
-updateAux(PalmBefore, PalmAfter) :- retract(PalmBefore), assertz(PalmAfter).
+% tiempo minimo deseado por el jardinero
+desired_time(12).
+
+%Estado inicial del problema
+initial_state(pwb,pwb(bucket(Y),duration(X),[jasmine,sheherazade,nina,elisa],[])) :-
+	bucket(B),
+	B == 5,
+	Y is B,
+	duration(D),
+	D == 0,
+	X is D.
+	
+%Estado final del problema
+final_state(pwb,pwb(bucket(Y),duration(X),[],[jasmine,sheherazade,nina,elisa])) :-
+	desired_time(Dt),
+	duration(D),
+	D >= Dt,
+	bucket(B),
+	B == 0,
+	Y is B,
+	X is D.
+
+%Actualiza la duración, la lista de palmeras y el balde una vez regada la palmera.
+update(Palm, Water):- 
+	palm_needs(Palm,Z), 
+	Z\=0, 
+	Water-Z >=0, 
+	Y is -(Z-Water),
+	duration(T),
+	D is T+Z,
+	updatePalmsNeed(palm_needs(Palm,Z), palm_needs(Palm,0)),
+	updateDuration(duration(T),duration(D)),
+	updateBucket(bucket(Water),bucket(Y)).
+
+updatePalmsNeed(PalmBefore, PalmAfter) :- 
+	retract(PalmBefore), 
+	assertz(PalmAfter).
+
+updateBucket(BucketBefore,BucketAfter) :- 
+	retract(BucketBefore), 
+	assertz(BucketAfter).
+
+updateDuration(DurationBefore,DurationAfter):- 
+	retract(DurationBefore), 
+	assertz(DurationAfter).
