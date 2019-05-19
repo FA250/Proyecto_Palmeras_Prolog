@@ -44,13 +44,13 @@ initial_state(pwb,pwb(well,Bucket,[jasmine,sheherazade,nina,elisa],[],0)) :-
 	Bucket is 0.
 	
 %Estado final del problema
-final_state(pwb(Posicion,Bucket,[],Historia,Tiempo)) :-
+final_state(pwb(_,_,[],_,Tiempo)) :-
 	desired_time(TiempoDeseado),
 	Tiempo >=TiempoDeseado,
 	write('Tiempo: '),write(Tiempo),write('>'),write('Tiempo Deseado:'),write(TiempoDeseado).
 
 %Actualiza la duración, la lista de palmeras y el balde una vez regada la palmera.
-update(pwb(Posicion,Bucket,Palmeras,Historia,Tiempo),Movida, pwb(Movida,Bucket2,Palmeras2,Historia2,Tiempo2),Tiempo2):-
+update(pwb(_,Bucket,Palmeras,Historia,Tiempo),Movida, pwb(Movida,Bucket2,Palmeras2,Historia2,Tiempo2),Tiempo2):-
 	Palmeras \= [],
 	update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2),
 	update_tiempo(Movida,Tiempo,Tiempo2),
@@ -71,7 +71,7 @@ update_bucket(Bucket,Bucket2,Movida):-
 
 %Movimiento final si el bucket tiene agua pero ya se regaron las palmeras
 %Se procede a ir al pozo y depositar el agua restante, actualizar tiempo.
-move(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),pwb(well,BucketFinal,Movidas,Historia,TiempoFinal),Movida):-
+move(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),pwb(well,BucketFinal,Movidas,Historia,TiempoFinal),_):-
 	Movidas == [],
 	palm2well(Posicion,Cantidad),
 	TiempoFinal is Tiempo+Cantidad+Bucket,
@@ -90,7 +90,7 @@ move(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),pwb(Movida,Bucket,Movidas,Hist
 	Tiempo2 is Tiempo+Cantidad.
 
 %Llenar el balde cuando está en 0
-move(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),pwb(Movida,Bucket2,Movidas,Historia,Tiempo2),Movida):-
+move(pwb(Posicion,_,Movidas,Historia,Tiempo),pwb(Movida,Bucket2,Movidas,Historia,Tiempo2),Movida):-
 	Posicion == well,
 	%Bucket == 0,
 	bucket(Bucket2),
@@ -117,12 +117,12 @@ legal(Estado1,Estado,Movida):-
 	not(ilegal(Estado1,Estado,Movida)).
 
 %Movimiento ilegal si el bucket no tiene suficiente agua para regar una palmera
-ilegal(pwb(_,Bucket1,_,_,_),pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida):-
+ilegal(pwb(_,Bucket1,_,_,_),pwb(Posicion,_,_,_,_),_):-
 	palm_needs(Posicion,Cantidad),
 	Resultado = Bucket1-Cantidad,
 	Resultado < 0.
 
-ilegal(pwb(Posicion1,Bucket1,Movidas1,Historia1,Tiempo1),pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida):-
+ilegal(pwb(Posicion1,Bucket1,_,_,_),pwb(Posicion,_,_,_,_),_):-
 	Bucket1 > 0,
 	Posicion1 == well,
 	Posicion \= well.
