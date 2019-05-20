@@ -73,7 +73,9 @@ update_tiempo(Posicion,well,Tiempo,Tiempo2, Palmeras, Bucket):-
 	palm2well(Posicion,Cantidad2),
 	Tiempo2 is Tiempo+Bucket+Cantidad2.
 	
-update_tiempo(Posicion,well,Tiempo,Tiempo2,_,_):-	
+update_tiempo(Posicion,well,Tiempo,Tiempo2,Palmeras,Bucket1):-	
+	Palmeras\=[],
+	Bucket1==0,
 	bucket(Bucket),
 	palm2well(Posicion,Cantidad2),
 	Tiempo2 is Tiempo+Bucket+Cantidad2.
@@ -113,19 +115,22 @@ move(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida):-
 	Movida=well.
 
 %Moverse de una palmera a otra
-move(pwb(Posicion,Bucket,[Movida|Movidas],Historia,Tiempo),Movida):-
+move(pwb(Posicion,Bucket,[Movida|Movidas],Historia,Tiempo),Movida2):-
+	member(Movida2,[Movida|Movidas]),
 	Bucket \= 0,
-	palm2palm(Posicion,Movida,Cantidad).
+	palm2palm(Posicion,Movida2,Cantidad).
 	
-move(pwb(Posicion,Bucket,[Movida|Movidas],Historia,Tiempo),Movida):-
+move(pwb(Posicion,Bucket,[Movida|Movidas],Historia,Tiempo),Movida2):-
+	member(Movida2,[Movida|Movidas]),
 	Bucket \= 0,
-	palm2palm(Movida,Posicion,Cantidad).
+	palm2palm(Movida2,Posicion,Cantidad).
 
 %Llenar el balde cuando está en 0
-move(pwb(Posicion,_,[Movida|Movidas],Historia,Tiempo),Movida):-
+move(pwb(Posicion,_,[Movida|Movidas],Historia,Tiempo),Movida2):-
+	member(Movida2,[Movida|Movidas]),
 	Posicion == well,
 	%Bucket == 0,
-	palm2well(Movida,Cantidad).
+	palm2well(Movida2,Cantidad).
 
 
 	
