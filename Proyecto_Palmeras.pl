@@ -131,9 +131,6 @@ move(pwb(Posicion,_,[Movida|Movidas],Historia,Tiempo),Movida2):-
 	%Bucket == 0,
 	palm2well(Movida2,Cantidad).
 
-
-	
-
 legal(Estado):-
 	not(ilegal(Estado)).
 
