@@ -18,13 +18,13 @@ palm_needs(sheherazade,1).
 palm_needs(nina,2).
 palm_needs(elisa,4).
 
-% tamaÒo del balde
+% tama√±o del balde
 bucket(5).
 
 % tiempo minimo deseado por el jardinero
 desired_time(114).
 
-% Cuando la lista est· vacÌa todas las movidas fueron hechas pero estoy en una palmera
+% Cuando la lista est√° vac√≠a todas las movidas fueron hechas pero estoy en una palmera
 % y el balde tiene agua hago solve_dfs para actualizar el balde
 solve_dfs(pwb(well,0,[],Resultado,Tiempo),_,_,_) :- 
 	final_state(pwb(well,0,[],Resultado,Tiempo)).
@@ -50,13 +50,12 @@ final_state(pwb(_,_,[],Resultado,Tiempo)) :-
 	write('Tiempo: '),write(Tiempo),write('>'),write('Tiempo Deseado:'),write(TiempoDeseado),
 	write('\nResultado: '),write(Resultado).
 
-%Actualiza la duraciÛn, la lista de palmeras y el balde una vez regada la palmera.
+%Actualiza la duraci√≥n, la lista de palmeras y el balde una vez regada la palmera.
 update(pwb(Posicion,Bucket,Palmeras,Historia,Tiempo),Movida, pwb(Movida,Bucket2,Palmeras2,Historia2,Tiempo2),Tiempo2,Palmeras2):-	
 	update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2),	
 	update_bucket(Bucket,Bucket2,Movida,Palmeras),
 	update_tiempo(Posicion,Movida,Tiempo,Tiempo2,Palmeras,Bucket). 
 	
-
 update_palmeras(well,Palmeras,Palmeras,Historia,Historia).
 	
 update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2):-
@@ -125,7 +124,7 @@ move(pwb(Posicion,Bucket,[Movida|Movidas],Historia,Tiempo),Movida2):-
 	Bucket \= 0,
 	palm2palm(Movida2,Posicion,Cantidad).
 
-%Llenar el balde cuando est· en 0
+%Llenar el balde cuando est√° en 0
 move(pwb(Posicion,_,[Movida|Movidas],Historia,Tiempo),Movida2):-
 	member(Movida2,[Movida|Movidas]),
 	Posicion == well,
@@ -148,7 +147,7 @@ ilegal(pwb(Posicion,Bucket1,_,_,_)):-
 
 	
 select(X,[X|Xs],Xs).                          % Extrae primer elemento.
-select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).    % Extrae elemento de m·s adentro.
+select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).    % Extrae elemento de m√°s adentro.
 
 insert(X,[Y|Ys],[Y|Zs]):-
     insert(X,Ys,Zs).
