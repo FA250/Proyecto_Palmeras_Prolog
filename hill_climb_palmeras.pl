@@ -46,24 +46,28 @@ hill_climb(State,Move) :-
 
 % Caso: procesar la primera movida y continuar recursivamente
 evaluate_and_order([Move|Moves],Estado,MVs,OrderedMVs) :-
-    update(Estado,Move,Estado2,Tiempo2,Moves),         % obtiene nuevo estado usando movida
-    value(Estado,Move,Value),              % calcula el valor heurísico del nuevo estado
-    insertPair((Move,Value),MVs,MVs1), % inserta en orden el par (movida,valor) en lista de movidas
-    evaluate_and_order(Moves,Estado2,MVs1,OrderedMVs).  % procesa recursivamente el resto de movidas
+    update(Estado,Move,Estado2,Tiempo2,Moves2),         
+    value(Estado,Move,Value),              
+    insertPair((Move,Value),MVs,MVs1), 
+    evaluate_and_order(Moves,Estado,MVs1,OrderedMVs).  
 
 % Caso base: no hay más movidas que evaluar. Se retorna el acumulador como resultado.
 evaluate_and_order([],_,MVs,MVs).
 
 insertPair(MV,[],[MV]).
 insertPair((M,V),[(M1,V1)|MVs],[(M,V),(M1,V1)|MVs]) :-
-    V >= V1.
+    V > V1.
 insertPair((M,V),[(M1,V1)|MVs],[(M1,V1)|MVs1]) :-
-    V < V1,insertPair((M,V),MVs,MVs1).
+    V =< V1,insertPair((M,V),MVs,MVs1).
 
 value(pwb(well,Bucket,Movidas,Historia,Tiempo),Movida,Cantidad):-
 	palm2well(Movida,Cantidad).
 value(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida,Cantidad):-
 	Bucket ==0,
+	Posicion \= well,
+	palm2well(Posicion,Cantidad).
+value(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida,Cantidad):-
+	Bucket \=0,
 	Posicion \= well,
 	palm2well(Posicion,Cantidad).
 value(pwb(Posicion,Bucket,Movidas,Historia,Tiempo),Movida,Cantidad):-
@@ -92,7 +96,6 @@ update(pwb(Posicion,Bucket,Palmeras,Historia,Tiempo),Movida, pwb(Movida,Bucket2,
 	update_bucket(Bucket,Bucket2,Movida,Palmeras),
 	update_tiempo(Posicion,Movida,Tiempo,Tiempo2,Palmeras,Bucket). 
 	
-
 update_palmeras(well,Palmeras,Palmeras,Historia,Historia).
 	
 update_palmeras(Movida,Palmeras,Palmeras2,Historia,Historia2):-
@@ -180,8 +183,8 @@ ilegal(pwb(Posicion,Bucket1,_,_,_)):-
 	Posicion \= well.
 
 	
-select(X,[X|Xs],Xs).                          % Extrae primer elemento.
-select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).    % Extrae elemento de más adentro.
+select(X,[X|Xs],Xs).                          
+select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).    
 
 insert(X,[Y|Ys],[Y|Zs]):-
     insert(X,Ys,Zs).
